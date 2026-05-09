@@ -1,4 +1,4 @@
-const CACHE = 'creature-v1';
+const CACHE = 'creature-v2';
 const STATIC = ['./', './index.html', './style.css', './app.js', './manifest.json', './icon.svg'];
 
 self.addEventListener('install', e => {
@@ -17,7 +17,7 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
-  const { hostname } = new URL(e.request.url);
-  if (hostname.includes('inaturalist.org') || hostname.includes('nominatim.openstreetmap.org')) return;
+  // 外部APIはキャッシュせずブラウザに任せる（same-originのみキャッシュ）
+  if (new URL(e.request.url).origin !== self.location.origin) return;
   e.respondWith(caches.match(e.request).then(c => c || fetch(e.request)));
 });

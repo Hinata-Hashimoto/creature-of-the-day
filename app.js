@@ -436,11 +436,18 @@ async function init() {
     return;
   }
 
-  reverseGeocode(cachedLocation.lat, cachedLocation.lng).then(place => {
-    document.getElementById('location-text').textContent = `${place} 周辺 ${RADIUS_KM}km`;
-  });
+  setLocationText(cachedLocation.lat, cachedLocation.lng);
 
   await fetchAndRender(cachedLocation.lat, cachedLocation.lng);
+}
+
+// ── 場所ラベルを更新（即時 → 地名解決後に上書き）────────────
+function setLocationText(lat, lng) {
+  const el = document.getElementById('location-text');
+  el.textContent = `現在地 周辺 ${RADIUS_KM}km`;
+  reverseGeocode(lat, lng).then(place => {
+    el.textContent = `${place} 周辺 ${RADIUS_KM}km`;
+  });
 }
 
 // ── 場所パネル ───────────────────────────────────────────────
@@ -464,9 +471,7 @@ async function useCurrentLocation() {
     showError('位置情報を取得できませんでした。場所を手動で指定してください。', true);
     return;
   }
-  reverseGeocode(cachedLocation.lat, cachedLocation.lng).then(place => {
-    document.getElementById('location-text').textContent = `${place} 周辺 ${RADIUS_KM}km`;
-  });
+  setLocationText(cachedLocation.lat, cachedLocation.lng);
   await fetchAndRender(cachedLocation.lat, cachedLocation.lng);
 }
 
