@@ -25,11 +25,17 @@ body {
 
 #header {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+#header-sub {
+  display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
   padding: 0 4px;
-  gap: 8px;
 }
 
 #date-picker {
@@ -47,16 +53,117 @@ body {
   cursor: pointer;
 }
 
+#creature-label {
+  font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+  font-size: 0.85rem;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #7d8590;
+}
+
 #date-display {
   font-size: 1.4rem;
   font-weight: 600;
   letter-spacing: 0.02em;
 }
 
-#location-display {
-  font-size: 0.78rem;
+#location-btn {
+  background: none;
+  border: none;
   color: #7d8590;
+  font-size: 0.78rem;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: color 0.15s;
 }
+
+#location-btn:hover { color: #c9d1d9; }
+
+#location-panel {
+  width: 100%;
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#gps-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #8b949e;
+  font-size: 0.8rem;
+  font-family: inherit;
+  padding: 5px 12px;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+#gps-btn:hover { color: #e6edf3; border-color: #8b949e; }
+
+.loc-presets {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.loc-presets button {
+  background: none;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #8b949e;
+  font-size: 0.78rem;
+  font-family: inherit;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.loc-presets button:hover { border-color: #58a6ff; color: #58a6ff; }
+
+.loc-manual {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.loc-manual input {
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #e6edf3;
+  padding: 4px 8px;
+  font-size: 0.78rem;
+  width: 108px;
+}
+
+.loc-manual button {
+  background: none;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #8b949e;
+  font-size: 0.78rem;
+  font-family: inherit;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.loc-manual button:hover { border-color: #58a6ff; color: #58a6ff; }
 
 #card {
   background: #161b22;
@@ -145,6 +252,18 @@ footer#license-notice {
 
 footer#license-notice a { color: #3a3f47; text-decoration: none; }
 footer#license-notice a:hover { color: #555; }
+
+#github-link {
+  display: block;
+  text-align: center;
+  font-size: 0.7rem;
+  color: #484f58;
+  text-decoration: none;
+  padding-bottom: 8px;
+  transition: color 0.15s;
+}
+
+#github-link:hover { color: #8b949e; }
 
 #info {
   padding: 20px 20px 24px;

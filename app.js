@@ -21,12 +21,74 @@ function initDatePicker() {
   document.getElementById('date-picker').value = dateKey(new Date());
 }
 
-// ── 日付ヘッダー表示 ──────────────────────────────────────────
+// ── 7セグメント日付ディスプレイ ──────────────────────────────
 function renderDateHeader() {
-  const date = getSelectedDate();
-  document.getElementById('date-display').textContent = date.toLocaleDateString('ja-JP', {
-    year: 'numeric', month: 'long', day: 'numeric', weekday: 'short'
-  });
+  document.getElementById('date-display').innerHTML = buildSegmentDisplay(getSelectedDate());
+}
+
+function buildSegmentDisplay(date) {
+  const W = 30, H = 58, T = 5, GAP = 7, DOT_W = 12;
+
+  // [a, b, c, d, e, f, g] — top, top-right, bot-right, bottom, bot-left, top-left, middle
+  const SEGS = {
+    0:[1,1,1,1,1,1,0], 1:[0,1,1,0,0,0,0], 2:[1,1,0,1,1,0,1],
+    3:[1,1,1,1,0,0,1], 4:[0,1,1,0,0,1,1], 5:[1,0,1,1,0,1,1],
+    6:[1,0,1,1,1,1,1], 7:[1,1,1,0,0,0,0], 8:[1,1,1,1,1,1,1],
+    9:[1,1,1,1,0,1,1],
+  };
+
+  const C  = T * 0.42; // 面取り量
+  const M  = H / 2;    // 中間高さ
+
+  function hbar(x, y, w, on) {
+    const p = `M${x+C},${y} L${x+w-C},${y} L${x+w},${y+T/2} L${x+w-C},${y+T} L${x+C},${y+T} L${x},${y+T/2} Z`;
+    return `<path d="${p}" fill="white" opacity="${on ? .9 : .055}"/>`;
+  }
+  function vbar(x, y, h, on) {
+    const p = `M${x+T/2},${y} L${x+T},${y+C} L${x+T},${y+h-C} L${x+T/2},${y+h} L${x},${y+h-C} L${x},${y+C} Z`;
+    return `<path d="${p}" fill="white" opacity="${on ? .9 : .055}"/>`;
+  }
+
+  function digit(n, ox, oy) {
+    const s = SEGS[n];
+    const iw = W - T * 2;       // 横セグメント長
+    const sh = M - T * 1.5;     // 縦セグメント長
+    return [
+      hbar(ox + T,     oy,           iw, s[0]),  // a
+      vbar(ox + W - T, oy + T,       sh, s[1]),  // b
+      vbar(ox + W - T, oy + M + T*.5, sh, s[2]), // c
+      hbar(ox + T,     oy + H - T,   iw, s[3]),  // d
+      vbar(ox,         oy + M + T*.5, sh, s[4]), // e
+      vbar(ox,         oy + T,       sh, s[5]),  // f
+      hbar(ox + T,     oy + M - T/2, iw, s[6]),  // g
+    ].join('');
+  }
+
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+
+  // 各文字のX位置: D0 D1 . D2 D3
+  const x0=0, x1=x0+W+GAP, x2=x1+W+GAP, x3=x2+DOT_W+GAP, x4=x3+W+GAP;
+  const totalW = x4 + W;
+  const SVG_W  = 240;
+  const ox     = (SVG_W - totalW) / 2;
+
+  const wds  = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+  const mono = `'SF Mono','Courier New',monospace`;
+  const yr   = date.getFullYear();
+  const wd   = wds[date.getDay()];
+
+  return `
+  <svg width="${SVG_W}" height="${H + 28}" viewBox="0 0 ${SVG_W} ${H + 28}" style="display:block;margin:auto">
+    ${digit(+mm[0], ox + x0, 0)}
+    ${digit(+mm[1], ox + x1, 0)}
+    <circle cx="${ox + x2 + DOT_W/2}" cy="${H * 0.73}" r="3.5" fill="white" opacity=".9"/>
+    ${digit(+dd[0], ox + x3, 0)}
+    ${digit(+dd[1], ox + x4, 0)}
+    <text x="${SVG_W/2}" y="${H + 20}" text-anchor="middle"
+          fill="white" opacity=".6" font-size="12" font-family="${mono}"
+          letter-spacing="3">${yr}  ${wd}</text>
+  </svg>`;
 }
 
 // ── 位置情報取得（タイムアウト8秒）─────────────────────────
@@ -375,9 +437,36 @@ async function init() {
   }
 
   reverseGeocode(cachedLocation.lat, cachedLocation.lng).then(place => {
-    document.getElementById('location-display').textContent = `📍 ${place} 周辺 ${RADIUS_KM}km`;
+    document.getElementById('location-text').textContent = `${place} 周辺 ${RADIUS_KM}km`;
   });
 
+  await fetchAndRender(cachedLocation.lat, cachedLocation.lng);
+}
+
+// ── 場所パネル ───────────────────────────────────────────────
+function toggleLocationPanel() {
+  document.getElementById('location-panel').classList.toggle('hidden');
+}
+
+function closeLocationPanel() {
+  document.getElementById('location-panel').classList.add('hidden');
+}
+
+async function useCurrentLocation() {
+  closeLocationPanel();
+  document.getElementById('loading').classList.remove('hidden');
+  document.getElementById('creature').classList.add('hidden');
+  document.getElementById('error').classList.add('hidden');
+  document.getElementById('algo-debug').classList.add('hidden');
+  try {
+    cachedLocation = await getLocation();
+  } catch {
+    showError('位置情報を取得できませんでした。場所を手動で指定してください。', true);
+    return;
+  }
+  reverseGeocode(cachedLocation.lat, cachedLocation.lng).then(place => {
+    document.getElementById('location-text').textContent = `${place} 周辺 ${RADIUS_KM}km`;
+  });
   await fetchAndRender(cachedLocation.lat, cachedLocation.lng);
 }
 
@@ -391,12 +480,20 @@ async function useManualLatLng() {
   await startWithLocation(lat, lng);
 }
 
+async function usePanelManualLatLng() {
+  const lat = parseFloat(document.getElementById('panel-lat').value);
+  const lng = parseFloat(document.getElementById('panel-lng').value);
+  if (isNaN(lat) || isNaN(lng)) { alert('正しい数値を入力してください'); return; }
+  await startWithLocation(lat, lng);
+}
+
 async function startWithLocation(lat, lng) {
+  closeLocationPanel();
   cachedLocation = { lat, lng };
   document.getElementById('error').classList.add('hidden');
   document.getElementById('loading').classList.remove('hidden');
   reverseGeocode(lat, lng).then(place => {
-    document.getElementById('location-display').textContent = `📍 ${place} 周辺 ${RADIUS_KM}km`;
+    document.getElementById('location-text').textContent = `${place} 周辺 ${RADIUS_KM}km`;
   });
   await fetchAndRender(lat, lng);
 }

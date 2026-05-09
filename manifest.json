@@ -1,0 +1,19 @@
+{
+  "name": "Creature of the Day",
+  "short_name": "今日の生き物",
+  "description": "今いる場所・今の季節を代表する生き物を毎日ひとつ教えてくれるアプリ",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0d1117",
+  "theme_color": "#0d1117",
+  "lang": "ja",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

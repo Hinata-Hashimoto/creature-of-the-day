@@ -5,13 +5,56 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>今日の生き物</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0d1117">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="今日の生き物">
+  <link rel="apple-touch-icon" href="icon.svg">
 </head>
 <body>
   <div id="app">
     <div id="header">
+      <div id="creature-label">Creature of the Day</div>
       <div id="date-display"></div>
-      <div id="location-display"></div>
-      <input type="date" id="date-picker" onchange="onDateChange()">
+      <div id="header-sub">
+        <button id="location-btn" onclick="toggleLocationPanel()">
+          <svg width="10" height="13" viewBox="0 0 10 13" fill="none">
+            <path d="M5 0C2.24 0 0 2.24 0 5c0 3.75 5 8 5 8s5-4.25 5-8C10 2.24 7.76 0 5 0zm0 6.75a1.75 1.75 0 1 1 0-3.5 1.75 1.75 0 0 1 0 3.5z" fill="currentColor"/>
+          </svg>
+          <span id="location-text">取得中…</span>
+        </button>
+        <input type="date" id="date-picker" onchange="onDateChange()">
+      </div>
+
+      <div id="location-panel" class="hidden">
+        <button id="gps-btn" onclick="useCurrentLocation()">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+            <circle cx="6.5" cy="6.5" r="2" fill="currentColor"/>
+            <circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.2" fill="none"/>
+            <line x1="6.5" y1="0" x2="6.5" y2="2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            <line x1="6.5" y1="11" x2="6.5" y2="13" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            <line x1="0" y1="6.5" x2="2" y2="6.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            <line x1="11" y1="6.5" x2="13" y2="6.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+          現在地を取得
+        </button>
+        <div class="loc-presets">
+          <button onclick="usePreset(43.062, 141.354)">札幌</button>
+          <button onclick="usePreset(38.269, 140.869)">仙台</button>
+          <button onclick="usePreset(35.681, 139.767)">東京</button>
+          <button onclick="usePreset(35.170, 136.906)">名古屋</button>
+          <button onclick="usePreset(34.693, 135.502)">大阪</button>
+          <button onclick="usePreset(34.385, 132.455)">広島</button>
+          <button onclick="usePreset(33.590, 130.401)">博多</button>
+          <button onclick="usePreset(26.212, 127.679)">那覇</button>
+        </div>
+        <div class="loc-manual">
+          <input type="number" id="panel-lat" placeholder="緯度" step="0.001">
+          <input type="number" id="panel-lng" placeholder="経度" step="0.001">
+          <button onclick="usePanelManualLatLng()">決定</button>
+        </div>
+      </div>
     </div>
 
     <div id="card">
@@ -41,10 +84,14 @@
         <div id="manual-location" class="hidden">
           <p class="hint">緯度・経度を入力するか、プリセットを選んでください</p>
           <div id="presets">
-            <button onclick="usePreset(35.681, 139.767)">東京</button>
-            <button onclick="usePreset(34.693, 135.502)">大阪</button>
-            <button onclick="usePreset(35.011, 135.768)">京都</button>
             <button onclick="usePreset(43.062, 141.354)">札幌</button>
+            <button onclick="usePreset(38.269, 140.869)">仙台</button>
+            <button onclick="usePreset(35.681, 139.767)">東京</button>
+            <button onclick="usePreset(35.170, 136.906)">名古屋</button>
+            <button onclick="usePreset(34.693, 135.502)">大阪</button>
+            <button onclick="usePreset(34.385, 132.455)">広島</button>
+            <button onclick="usePreset(33.590, 130.401)">博多</button>
+            <button onclick="usePreset(26.212, 127.679)">那覇</button>
           </div>
           <div id="latlng-form">
             <input type="number" id="input-lat" placeholder="緯度 (例: 35.68)" step="0.001">
@@ -66,9 +113,14 @@
       写真: <a href="https://www.inaturalist.org" target="_blank">iNaturalist</a>
       ／ <a href="https://creativecommons.org/licenses/" target="_blank">CC ライセンス</a>準拠・非商用
     </footer>
+    <a id="github-link" href="https://github.com/Hinata-Hashimoto/creature-of-the-day" target="_blank">このサイトの詳細はこちら →</a>
   </div>
 
-
   <script src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js');
+    }
+  </script>
 </body>
 </html>
