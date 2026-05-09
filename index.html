@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>今日の生き物</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <div id="header">
+      <div id="date-display"></div>
+      <div id="location-display"></div>
+      <input type="date" id="date-picker" onchange="onDateChange()">
+    </div>
+
+    <div id="card">
+      <div id="loading">
+        <div class="spinner"></div>
+        <p>近くの生き物を探しています…</p>
+      </div>
+
+      <div id="creature" class="hidden">
+        <div id="photo-wrap">
+          <img id="photo" src="" alt="">
+          <div id="photo-placeholder">
+            <span>写真なし（権利留保）</span>
+          </div>
+          <div id="photo-credit"></div>
+        </div>
+        <div id="info">
+          <div id="common-name"></div>
+          <div id="sci-name"></div>
+          <div id="stats"></div>
+          <a id="inat-link" href="" target="_blank">iNaturalistで見る →</a>
+        </div>
+      </div>
+
+      <div id="error" class="hidden">
+        <p id="error-msg"></p>
+        <div id="manual-location" class="hidden">
+          <p class="hint">緯度・経度を入力するか、プリセットを選んでください</p>
+          <div id="presets">
+            <button onclick="usePreset(35.681, 139.767)">東京</button>
+            <button onclick="usePreset(34.693, 135.502)">大阪</button>
+            <button onclick="usePreset(35.011, 135.768)">京都</button>
+            <button onclick="usePreset(43.062, 141.354)">札幌</button>
+          </div>
+          <div id="latlng-form">
+            <input type="number" id="input-lat" placeholder="緯度 (例: 35.68)" step="0.001">
+            <input type="number" id="input-lng" placeholder="経度 (例: 139.77)" step="0.001">
+            <button onclick="useManualLatLng()">決定</button>
+          </div>
+        </div>
+        <button onclick="init()">再試行</button>
+      </div>
+    </div>
+
+    <div id="algo-debug" class="hidden">
+      <h3>スコア上位5種</h3>
+      <table id="debug-table"></table>
+    </div>
+    <button id="debug-toggle" onclick="toggleDebug()">スコア詳細を表示</button>
+
+    <footer id="license-notice">
+      写真: <a href="https://www.inaturalist.org" target="_blank">iNaturalist</a>
+      ／ <a href="https://creativecommons.org/licenses/" target="_blank">CC ライセンス</a>準拠・非商用
+    </footer>
+  </div>
+
+
+  <script src="app.js"></script>
+</body>
+</html>
